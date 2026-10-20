@@ -17,6 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
+from rest_framework.permissions import AllowAny
+from rest_framework.renderers import JSONOpenAPIRenderer
+from rest_framework.schemas import get_schema_view
 
 from apps.common.views import live, ready
 
@@ -25,4 +29,21 @@ urlpatterns = [
     path("health/live/", live, name="health-live"),
     path("health/ready/", ready, name="health-ready"),
     path("api/v1/auth/", include("apps.users.urls")),
+    path("api/v1/", include("apps.catalog.urls")),
+    path(
+        "api/schema/",
+        get_schema_view(
+            title="ShopForge API",
+            version="1.0.0",
+            public=True,
+            permission_classes=[AllowAny],
+            renderer_classes=[JSONOpenAPIRenderer],
+        ),
+        name="api-schema",
+    ),
+    path(
+        "api/docs/",
+        TemplateView.as_view(template_name="api_docs.html"),
+        name="api-docs",
+    ),
 ]
